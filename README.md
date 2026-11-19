@@ -12,11 +12,15 @@
 
 Enter your measurements, describe your goal in plain English, and pick the equipment you have. Forge builds a weekly plan that only uses what you own, then helps you track progress privately in your browser. No account, and it works with no API key.
 
+Forge is a Turborepo monorepo with **two apps on one engine**: a [Next.js web app](#the-web-app) and a [`forge` command-line tool](#the-cli), both built on the same planner and export packages.
+
 ## Contents
 
 - [Overview](#overview)
 - [Features](#features)
 - [Architecture](#architecture)
+- [The web app](#the-web-app)
+- [The CLI](#the-cli)
 - [How the plan is built](#how-the-plan-is-built)
 - [Tech stack](#tech-stack)
 - [Project structure](#project-structure)
@@ -47,32 +51,84 @@ So an invalid or hallucinated model response can never put equipment you do not 
 - **Injury-aware.** Mention a sore knee, shoulder, back, wrist or hip and exercises that commonly stress that area are left out.
 - **Progress tracking.** Log weight and measurements, see trends, and compare first against latest photos.
 - **Private by design.** Measurements and photos never leave the browser. Photos are resized on the device and stripped of EXIF location data.
-- **Print-ready plan.**
+- **Print, calendar and Markdown export.** Print the plan, download it as a weekly recurring calendar (.ics), or copy it as Markdown.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    subgraph Browser
-        UI[apps/web<br/>Next.js UI] --> P[packages/planner<br/>deterministic engine]
-        UI --> LS[(localStorage<br/>profile, logs, photos)]
+    subgraph apps
+        W[apps/web<br/>Next.js UI]
+        C[apps/cli<br/>forge command]
     end
-    UI -->|goal text only| API[POST /api/interpret]
-    API --> I{ANTHROPIC_API_KEY?}
-    I -->|yes| C[Claude<br/>structured goal]
-    I -->|no or failure| K[Offline keyword parser]
-    C -->|validated| P
+    subgraph packages
+        P[packages/planner<br/>deterministic engine]
+        E[packages/export<br/>Markdown, text, JSON, .ics]
+    end
+    W --> P
+    W --> E
+    C --> P
+    C --> E
+    E --> P
+    W -->|goal text only| API[POST /api/interpret]
+    C -->|goal text only, with --ai| AI
+    API --> AI{ANTHROPIC_API_KEY?}
+    AI -->|yes| CL[Claude<br/>structured goal]
+    AI -->|no or failure| K[Offline keyword parser]
+    CL -->|validated| P
     K --> P
-    P --> Plan[Weekly plan]
+    W --> LS[(localStorage<br/>profile, logs, photos)]
 ```
 
 ```
 forge/
-├── apps/web                  Next.js 16 (App Router), React 19, Tailwind v4
-└── packages/planner          Framework-free TypeScript planning engine
+├── apps/
+│   ├── web                   Next.js 16 (App Router), React 19, Tailwind v4
+│   └── cli                   `forge` command: plan and exercises, bundled with tsup
+└── packages/
+    ├── planner               Framework-free planning engine (types, exercises, goals, plan)
+    └── export                Renders a plan as Markdown, text, JSON or an iCalendar file
 ```
 
-`packages/planner` has no framework dependency, so it can be tested in isolation and reused (for example by a mobile app or a CLI).
+### Why a monorepo
+
+- **One engine, two products.** The web app and the CLI call the same `generatePlan`, so a plan built in the browser and one built in the terminal are identical for the same inputs.
+- **Shared renderers.** The web app's "Calendar" and "Markdown" buttons and `forge plan --format ics|markdown` both use `@forge/export`. It is written once and tested once.
+- **Framework-free packages.** Neither package imports React, Next.js or Node APIs, which is why they can run in a browser bundle and a terminal binary.
+- **One toolchain.** A single `pnpm test`, `pnpm lint` and `pnpm build` runs across all four workspaces through Turborepo, with one CI job.
+
+## The web app
+
+The interactive product: build a plan, print it, download it to your calendar, and track progress locally. See [Features](#features).
+
+```bash
+pnpm dev        # http://localhost:3000
+```
+
+## The CLI
+
+`forge` builds and exports plans without opening a browser. Output formats are `text` (the default), `markdown`, `json` and `ics`.
+
+```bash
+pnpm --filter @forge/cli build        # produces apps/cli/dist/bin.js
+
+# a plan in the terminal
+node apps/cli/dist/bin.js plan --goal "build muscle, bigger chest" \
+  --height 178 --weight 80 --days 4 --minutes 60 \
+  --experience intermediate --equipment dumbbells,bench
+
+# a recurring weekly calendar you can import into Google, Apple or Outlook
+node apps/cli/dist/bin.js plan --goal "get stronger" --height 170 --weight 65 \
+  --format ics --start 2026-03-02 --weeks 12 --hour 7 --out forge.ics
+
+# browse the exercise library
+node apps/cli/dist/bin.js exercises --muscle glutes --equipment bands
+```
+
+- Validates every flag, prints a clear message and exits with code `2` on bad input (`1` for runtime failures).
+- `--ai` reads the goal with Claude when `ANTHROPIC_API_KEY` is set and falls back to the offline parser on any failure. It is off by default, so the CLI never makes a network call unless you ask.
+- Calendar files use floating local time and a weekly `RRULE`, and are checked against a real iCalendar parser during development.
+- During development, run it without building: `pnpm --filter @forge/cli dev plan --goal "..." --height 178 --weight 80`.
 
 ## How the plan is built
 
@@ -99,20 +155,33 @@ The same input always gives the same plan.
 
 ```
 forge/
-├── apps/web/
-│   └── src/
-│       ├── app/                 Pages: /, /build, /progress, and POST /api/interpret
-│       ├── components/          BuildClient, ProgressClient, Nav
-│       └── lib/                 storage (SSR-safe localStorage), image (resize, strip EXIF), units
-├── packages/planner/
-│   └── src/
-│       ├── exercises.ts         The exercise library
-│       ├── goals.ts             Offline goal and limitation parser
-│       ├── ai.ts                Claude interpretation with validation and fallback
-│       ├── plan.ts              Deterministic plan generator
-│       ├── metrics.ts           BMI and waist ratios
-│       ├── types.ts             Shared types
-│       └── planner.test.ts      20 unit tests
+├── apps/
+│   ├── web/
+│   │   └── src/
+│   │       ├── app/             Pages: /, /build, /progress, and POST /api/interpret
+│   │       ├── components/      BuildClient, ProgressClient, Nav
+│   │       └── lib/             storage (SSR-safe localStorage), image (resize, strip EXIF), units, download
+│   └── cli/
+│       └── src/
+│           ├── bin.ts           Entry point (wires real stdout, files, fetch)
+│           ├── cli.ts           Argument parsing and exit codes
+│           ├── commands/        plan, exercises
+│           ├── validate.ts      Flag parsing with clear errors
+│           └── cli.test.ts      27 tests against an injected, hermetic I/O layer
+├── packages/
+│   ├── planner/
+│   │   └── src/
+│   │       ├── exercises.ts     The exercise library
+│   │       ├── goals.ts         Offline goal and limitation parser
+│   │       ├── ai.ts            Claude interpretation with validation and fallback
+│   │       ├── plan.ts          Deterministic plan generator
+│   │       ├── metrics.ts       BMI and waist ratios
+│   │       ├── types.ts         Shared types
+│   │       └── planner.test.ts  20 unit tests
+│   └── export/
+│       └── src/
+│           ├── markdown.ts, text.ts, json.ts, ics.ts
+│           └── export.test.ts   12 unit tests
 ├── .github/workflows/ci.yml     Format, lint, typecheck, test, build
 ├── turbo.json, pnpm-workspace.yaml, tsconfig.base.json
 └── .editorconfig, .prettierrc.json, .nvmrc, LICENSE
@@ -151,15 +220,17 @@ Run from the repository root.
 | ------------------- | ---------------------------------------------- |
 | `pnpm dev`          | Start the web app                              |
 | `pnpm build`        | Build everything through Turborepo             |
-| `pnpm lint`         | ESLint                                         |
+| `pnpm lint`         | ESLint (web and CLI)                           |
 | `pnpm typecheck`    | `tsc --noEmit` in every package                |
-| `pnpm test`         | Planner unit tests                             |
+| `pnpm test`         | Planner, export and CLI tests (59 in total)    |
 | `pnpm format`       | Format everything with Prettier                |
 | `pnpm format:check` | Fail if anything is not formatted (used in CI) |
 
 ## Testing and quality gates
 
-The planner has 20 unit tests that run offline. They cover goal parsing, limitation mapping and the plan's invariants: only equipment you own is used, bodyweight-only plans never need equipment, limitations remove conflicting exercises, sessions stay within the time budget, no exercise repeats in a day, timed holds are prescribed in seconds, beginners do not get the hardest movements, and the output is deterministic. They also cover the AI path: valid model output is accepted, invalid output falls back, and a failed request falls back.
+There are 59 tests in three packages, all offline. The planner has 20. They cover goal parsing, limitation mapping and the plan's invariants: only equipment you own is used, bodyweight-only plans never need equipment, limitations remove conflicting exercises, sessions stay within the time budget, no exercise repeats in a day, timed holds are prescribed in seconds, beginners do not get the hardest movements, and the output is deterministic. They also cover the AI path: valid model output is accepted, invalid output falls back, and a failed request falls back.
+
+The export package has 12 tests covering the Markdown and text layouts, JSON round-tripping, and the iCalendar output (CRLF endings, 75-octet line folding, text escaping, weekday alignment and input validation). The CLI has 27 tests that drive `run()` with an injected I/O object, so flag validation, exit codes, file output and the AI fallback are all checked without touching the real terminal, disk or network.
 
 CI runs `format:check`, `lint`, `typecheck`, `test` and `build` on every push and pull request.
 
@@ -179,7 +250,9 @@ CI runs `format:check`, `lint`, `typecheck`, `test` and `build` on every push an
 
 - **The model never writes the workouts.** It outputs a validated, bounded object and the planner does the rest, so constraints like equipment always hold.
 - **Offline first.** A keyword parser means the demo works with zero configuration, and the AI is an enhancement rather than a dependency.
-- **A framework-free engine package.** The planner imports nothing from React or Next.js.
+- **A framework-free engine package.** The planner imports nothing from React or Next.js, which is what let a second app reuse it unchanged.
+- **Packages ship TypeScript source.** Both packages export `.ts` directly. The web app transpiles them through Next.js and the CLI bundles them with tsup, so there is no separate build step to keep in sync.
+- **The CLI takes its I/O as arguments.** Stdout, files, the clock, environment and `fetch` are injected, which keeps the whole CLI testable and deterministic.
 - **Local-first data.** Storage sits behind a small hook, which is the seam a future sync backend would use.
 
 ## Limitations
@@ -192,6 +265,7 @@ CI runs `format:check`, `lint`, `typecheck`, `test` and `build` on every push an
 ## Roadmap
 
 - Workout logging with automatic load progression
+- Publish `forge` to npm so it can be run with `npx`
 - Exercise demo media
 - Sync across devices behind the same storage interface
 
