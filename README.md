@@ -51,7 +51,7 @@ So an invalid or hallucinated model response can never put equipment you do not 
 - **Injury-aware.** Mention a sore knee, shoulder, back, wrist or hip and exercises that commonly stress that area are left out.
 - **Progress tracking.** Log weight and measurements, see trends, and compare first against latest photos.
 - **Private by design.** Measurements and photos never leave the browser. Photos are resized on the device and stripped of EXIF location data.
-- **Print, calendar and Markdown export.** Print the plan, download it as a weekly recurring calendar (.ics), or copy it as Markdown.
+- **Print, calendar and Markdown export.** Print the plan, download it as a weekly recurring calendar (.ics), or download it as Markdown.
 
 ## Architecture
 
