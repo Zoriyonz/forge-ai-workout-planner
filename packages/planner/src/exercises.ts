@@ -1,0 +1,82 @@
+import type { Exercise } from "./types";
+
+const e = (x: Exercise): Exercise => x;
+
+export const EXERCISES: Exercise[] = [
+  // Squat and lunge patterns
+  e({ id: "bw-squat", name: "Bodyweight Squat", pattern: "squat", primary: "quads", requires: [], level: 1, cue: "Sit hips back and down, chest tall, knees track over toes." }),
+  e({ id: "goblet-squat", name: "Goblet Squat", pattern: "squat", primary: "quads", requires: ["dumbbells"], level: 1, cue: "Hold the weight at your chest and keep your elbows inside your knees." }),
+  e({ id: "kb-goblet-squat", name: "Kettlebell Goblet Squat", pattern: "squat", primary: "quads", requires: ["kettlebell"], level: 1, cue: "Hold the bell by the horns at your chest and squat between your knees." }),
+  e({ id: "back-squat", name: "Barbell Back Squat", pattern: "squat", primary: "quads", requires: ["barbell"], level: 3, avoid: ["back"], cue: "Brace your core, keep the bar over mid-foot, and use a rack with safeties." }),
+  e({ id: "leg-press", name: "Leg Press", pattern: "squat", primary: "quads", requires: ["machines"], level: 1, cue: "Lower under control and never lock out your knees at the top." }),
+  e({ id: "jump-squat", name: "Jump Squat", pattern: "squat", primary: "quads", requires: [], level: 2, avoid: ["knee", "back", "hip"], impact: true, cue: "Land softly and reset between reps." }),
+  e({ id: "split-squat", name: "Split Squat", pattern: "lunge", primary: "quads", requires: [], level: 1, avoid: ["knee"], cue: "Stay tall and lower straight down, front heel planted." }),
+  e({ id: "db-split-squat", name: "Dumbbell Split Squat", pattern: "lunge", primary: "quads", requires: ["dumbbells"], level: 2, avoid: ["knee"], cue: "Hold a dumbbell in each hand and lower straight down." }),
+  e({ id: "reverse-lunge", name: "Reverse Lunge", pattern: "lunge", primary: "glutes", requires: [], level: 1, cue: "Step back, lower until the front thigh is parallel, push through the front heel." }),
+  e({ id: "db-reverse-lunge", name: "Dumbbell Reverse Lunge", pattern: "lunge", primary: "glutes", requires: ["dumbbells"], level: 2, cue: "Hold the weights at your sides and keep your torso upright." }),
+  e({ id: "step-up", name: "Dumbbell Step-Up", pattern: "lunge", primary: "glutes", requires: ["dumbbells", "bench"], level: 2, cue: "Drive through the heel of the top foot and control the way down." }),
+
+  // Hinge pattern
+  e({ id: "glute-bridge", name: "Glute Bridge", pattern: "hinge", primary: "glutes", requires: [], level: 1, cue: "Squeeze your glutes at the top and keep your ribs down." }),
+  e({ id: "single-leg-bridge", name: "Single-Leg Glute Bridge", pattern: "hinge", primary: "glutes", requires: [], level: 2, cue: "Keep your hips level as you drive up through one heel." }),
+  e({ id: "db-hip-thrust", name: "Dumbbell Hip Thrust", pattern: "hinge", primary: "glutes", requires: ["dumbbells", "bench"], level: 1, cue: "Upper back on the bench, chin tucked, full hip extension at the top." }),
+  e({ id: "bb-hip-thrust", name: "Barbell Hip Thrust", pattern: "hinge", primary: "glutes", requires: ["barbell", "bench"], level: 2, cue: "Pad the bar, drive through your heels and pause at the top." }),
+  e({ id: "db-rdl", name: "Dumbbell Romanian Deadlift", pattern: "hinge", primary: "hamstrings", requires: ["dumbbells"], level: 1, cue: "Push your hips back with a soft knee bend and a flat back." }),
+  e({ id: "bb-rdl", name: "Barbell Romanian Deadlift", pattern: "hinge", primary: "hamstrings", requires: ["barbell"], level: 2, avoid: ["back"], cue: "Keep the bar close to your legs and feel the hamstring stretch." }),
+  e({ id: "deadlift", name: "Conventional Deadlift", pattern: "hinge", primary: "hamstrings", requires: ["barbell"], level: 3, avoid: ["back"], cue: "Brace hard, push the floor away, and keep the bar against your legs." }),
+  e({ id: "kb-swing", name: "Kettlebell Swing", pattern: "hinge", primary: "glutes", requires: ["kettlebell"], level: 2, avoid: ["back"], cue: "Snap your hips forward; the arms just guide the bell." }),
+  e({ id: "leg-curl", name: "Machine Leg Curl", pattern: "hinge", primary: "hamstrings", requires: ["machines"], level: 1, cue: "Curl smoothly and control the return." }),
+
+  // Pushing
+  e({ id: "incline-push-up", name: "Incline Push-Up", pattern: "push", primary: "chest", requires: [], level: 1, cue: "Hands on a sturdy raised surface, body in one straight line." }),
+  e({ id: "push-up", name: "Push-Up", pattern: "push", primary: "chest", requires: [], level: 1, avoid: ["wrist"], cue: "Elbows about 45 degrees from your sides, chest to the floor." }),
+  e({ id: "db-floor-press", name: "Dumbbell Floor Press", pattern: "push", primary: "chest", requires: ["dumbbells"], level: 1, cue: "Lower until your upper arms touch the floor, then press." }),
+  e({ id: "db-bench-press", name: "Dumbbell Bench Press", pattern: "push", primary: "chest", requires: ["dumbbells", "bench"], level: 1, cue: "Shoulder blades pinched, wrists stacked over elbows." }),
+  e({ id: "bb-bench-press", name: "Barbell Bench Press", pattern: "push", primary: "chest", requires: ["barbell", "bench"], level: 2, avoid: ["shoulder"], cue: "Plant your feet, pinch your shoulder blades, touch the bar to mid-chest." }),
+  e({ id: "chest-press-machine", name: "Machine Chest Press", pattern: "push", primary: "chest", requires: ["machines"], level: 1, cue: "Set the seat so handles line up with mid-chest." }),
+  e({ id: "band-chest-press", name: "Band Chest Press", pattern: "push", primary: "chest", requires: ["bands"], level: 1, cue: "Anchor the band behind you and press without shrugging." }),
+  e({ id: "cable-fly", name: "Cable Fly", pattern: "isolation", primary: "chest", requires: ["cables"], level: 2, avoid: ["shoulder"], cue: "Soft elbows; hug a barrel with your arms." }),
+  e({ id: "db-shoulder-press", name: "Dumbbell Shoulder Press", pattern: "push", primary: "shoulders", requires: ["dumbbells"], level: 1, avoid: ["shoulder"], cue: "Press straight overhead without arching your lower back." }),
+  e({ id: "bb-overhead-press", name: "Barbell Overhead Press", pattern: "push", primary: "shoulders", requires: ["barbell"], level: 2, avoid: ["shoulder", "back"], cue: "Squeeze your glutes and move your head through at the top." }),
+  e({ id: "machine-shoulder-press", name: "Machine Shoulder Press", pattern: "push", primary: "shoulders", requires: ["machines"], level: 1, avoid: ["shoulder"], cue: "Keep your ribs down and press without shrugging." }),
+  e({ id: "pike-push-up", name: "Pike Push-Up", pattern: "push", primary: "shoulders", requires: [], level: 2, avoid: ["wrist", "shoulder"], cue: "Hips high, lower the top of your head between your hands." }),
+  e({ id: "db-lateral-raise", name: "Dumbbell Lateral Raise", pattern: "isolation", primary: "shoulders", requires: ["dumbbells"], level: 1, cue: "Lead with your elbows and stop at shoulder height." }),
+  e({ id: "band-lateral-raise", name: "Band Lateral Raise", pattern: "isolation", primary: "shoulders", requires: ["bands"], level: 1, cue: "Stand on the band and raise to shoulder height." }),
+  e({ id: "bench-dip", name: "Bench Dip", pattern: "isolation", primary: "triceps", requires: ["bench"], level: 1, avoid: ["shoulder", "wrist"], cue: "Keep your back close to the bench and lower only as far as is comfortable." }),
+  e({ id: "diamond-push-up", name: "Diamond Push-Up", pattern: "isolation", primary: "triceps", requires: [], level: 2, avoid: ["wrist", "shoulder"], cue: "Hands close under your chest, elbows tucked." }),
+  e({ id: "db-triceps-extension", name: "Overhead Dumbbell Triceps Extension", pattern: "isolation", primary: "triceps", requires: ["dumbbells"], level: 1, cue: "Keep your elbows pointing forward and lower behind your head." }),
+  e({ id: "cable-pushdown", name: "Cable Triceps Pushdown", pattern: "isolation", primary: "triceps", requires: ["cables"], level: 1, cue: "Elbows pinned to your sides, fully straighten at the bottom." }),
+  e({ id: "band-pushdown", name: "Band Triceps Pushdown", pattern: "isolation", primary: "triceps", requires: ["bands"], level: 1, cue: "Anchor the band overhead and keep your elbows still." }),
+
+  // Pulling
+  e({ id: "pull-up", name: "Pull-Up", pattern: "pull", primary: "back", requires: ["pullup_bar"], level: 3, avoid: ["shoulder"], cue: "Start from a dead hang and pull your chest toward the bar." }),
+  e({ id: "chin-up", name: "Chin-Up", pattern: "pull", primary: "back", requires: ["pullup_bar"], level: 2, avoid: ["shoulder"], cue: "Palms facing you, drive your elbows down and back." }),
+  e({ id: "db-row", name: "One-Arm Dumbbell Row", pattern: "pull", primary: "back", requires: ["dumbbells"], level: 1, cue: "Brace on a surface and pull your elbow toward your hip." }),
+  e({ id: "bb-row", name: "Barbell Row", pattern: "pull", primary: "back", requires: ["barbell"], level: 2, avoid: ["back"], cue: "Hinge at the hips, flat back, pull the bar to your lower ribs." }),
+  e({ id: "band-row", name: "Band Row", pattern: "pull", primary: "back", requires: ["bands"], level: 1, cue: "Pull your elbows back and squeeze your shoulder blades together." }),
+  e({ id: "lat-pulldown", name: "Cable Lat Pulldown", pattern: "pull", primary: "back", requires: ["cables"], level: 1, cue: "Pull the bar to your upper chest, leading with your elbows." }),
+  e({ id: "seated-cable-row", name: "Seated Cable Row", pattern: "pull", primary: "back", requires: ["cables"], level: 1, cue: "Keep your chest tall and pull to your stomach." }),
+  e({ id: "machine-row", name: "Machine Row", pattern: "pull", primary: "back", requires: ["machines"], level: 1, cue: "Chest against the pad, squeeze at the end of each rep." }),
+  e({ id: "prone-y-raise", name: "Prone Y Raise", pattern: "pull", primary: "back", requires: [], level: 1, cue: "Lie face down and lift your arms into a Y with thumbs up." }),
+  e({ id: "superman", name: "Superman Hold", pattern: "pull", primary: "back", requires: [], level: 1, avoid: ["back"], timed: true, cue: "Lift your chest and legs a few inches and breathe steadily." }),
+  e({ id: "band-pull-apart", name: "Band Pull-Apart", pattern: "pull", primary: "shoulders", requires: ["bands"], level: 1, cue: "Arms straight, pull the band to your chest to hit your rear delts." }),
+  e({ id: "face-pull", name: "Cable Face Pull", pattern: "pull", primary: "shoulders", requires: ["cables"], level: 1, cue: "Pull toward your forehead with elbows high." }),
+  e({ id: "db-curl", name: "Dumbbell Curl", pattern: "isolation", primary: "biceps", requires: ["dumbbells"], level: 1, cue: "Elbows at your sides, no swinging." }),
+  e({ id: "hammer-curl", name: "Hammer Curl", pattern: "isolation", primary: "biceps", requires: ["dumbbells"], level: 1, cue: "Palms face each other the whole way." }),
+  e({ id: "band-curl", name: "Band Curl", pattern: "isolation", primary: "biceps", requires: ["bands"], level: 1, cue: "Stand on the band and curl without leaning back." }),
+  e({ id: "cable-curl", name: "Cable Curl", pattern: "isolation", primary: "biceps", requires: ["cables"], level: 1, cue: "Constant tension, slow on the way down." }),
+
+  // Calves
+  e({ id: "bw-calf-raise", name: "Standing Calf Raise", pattern: "isolation", primary: "calves", requires: [], level: 1, cue: "Rise onto your toes, pause, and lower slowly." }),
+  e({ id: "db-calf-raise", name: "Dumbbell Calf Raise", pattern: "isolation", primary: "calves", requires: ["dumbbells"], level: 1, cue: "Hold weights at your sides and pause at the top." }),
+
+  // Core
+  e({ id: "plank", name: "Plank", pattern: "core", primary: "core", requires: [], level: 1, timed: true, cue: "Ribs down, glutes tight, one straight line from head to heels." }),
+  e({ id: "side-plank", name: "Side Plank", pattern: "core", primary: "core", requires: [], level: 2, timed: true, avoid: ["shoulder"], cue: "Stack your feet and lift your hips so your body is straight." }),
+  e({ id: "dead-bug", name: "Dead Bug", pattern: "core", primary: "core", requires: [], level: 1, cue: "Press your lower back into the floor as opposite arm and leg extend." }),
+  e({ id: "bird-dog", name: "Bird Dog", pattern: "core", primary: "core", requires: [], level: 1, cue: "Reach long, keep your hips square, move slowly." }),
+  e({ id: "bicycle-crunch", name: "Bicycle Crunch", pattern: "core", primary: "core", requires: [], level: 1, avoid: ["back"], cue: "Rotate through your ribcage rather than yanking your neck." }),
+  e({ id: "hanging-knee-raise", name: "Hanging Knee Raise", pattern: "core", primary: "core", requires: ["pullup_bar"], level: 2, avoid: ["shoulder"], cue: "Curl your pelvis up instead of swinging." }),
+  e({ id: "pallof-press", name: "Pallof Press", pattern: "core", primary: "core", requires: ["bands"], level: 1, cue: "Press the band straight out and resist it rotating you." }),
+  e({ id: "cable-crunch", name: "Cable Crunch", pattern: "core", primary: "core", requires: ["cables"], level: 2, avoid: ["back"], cue: "Curl your ribs toward your hips with a rounded spine." }),
+];
