@@ -13,7 +13,17 @@ import {
 } from "@forge/planner";
 import { useMemo, useState } from "react";
 import { usePersisted } from "@/lib/storage";
-import { fromCm, fromKg, lengthLabel, num, round1, toCm, toKg, weightLabel, type Units } from "@/lib/units";
+import {
+  fromCm,
+  fromKg,
+  lengthLabel,
+  num,
+  round1,
+  toCm,
+  toKg,
+  weightLabel,
+  type Units,
+} from "@/lib/units";
 
 interface Saved {
   profile: Profile;
@@ -64,8 +74,10 @@ function stepError(step: number, f: Form, units: Units): string | null {
     const h = num(f.height);
     const w = num(f.weight);
     const a = num(f.age);
-    if (!h || toCm(h, units) < 120 || toCm(h, units) > 230) return "Enter a height between 120 and 230 cm (47 to 90 in).";
-    if (!w || toKg(w, units) < 35 || toKg(w, units) > 250) return "Enter a weight between 35 and 250 kg (77 to 550 lb).";
+    if (!h || toCm(h, units) < 120 || toCm(h, units) > 230)
+      return "Enter a height between 120 and 230 cm (47 to 90 in).";
+    if (!w || toKg(w, units) < 35 || toKg(w, units) > 250)
+      return "Enter a weight between 35 and 250 kg (77 to 550 lb).";
     if (!a || a < 16 || a > 90) return "Forge is built for ages 16 to 90.";
   }
   if (step === 1 && f.goalText.trim().length < 5) return "Describe your goal in a sentence or two.";
@@ -135,7 +147,10 @@ export function BuildClient() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const plan = useMemo(() => (saved ? generatePlan(saved.profile, saved.interpretation) : null), [saved]);
+  const plan = useMemo(
+    () => (saved ? generatePlan(saved.profile, saved.interpretation) : null),
+    [saved],
+  );
   const showWizard = ready && (!saved || editing);
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -216,7 +231,11 @@ export function BuildClient() {
               >
                 {i + 1}
               </span>
-              <span className={`hidden text-xs sm:inline ${i === step ? "text-white" : "text-mute"}`}>{s}</span>
+              <span
+                className={`hidden text-xs sm:inline ${i === step ? "text-white" : "text-mute"}`}
+              >
+                {s}
+              </span>
               {i < STEPS.length - 1 && <span className="h-px flex-1 bg-line" />}
             </li>
           ))}
@@ -227,7 +246,11 @@ export function BuildClient() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h1 className="font-display text-3xl">About you</h1>
-                <div className="flex rounded-full border border-line p-0.5 text-xs" role="group" aria-label="Units">
+                <div
+                  className="flex rounded-full border border-line p-0.5 text-xs"
+                  role="group"
+                  aria-label="Units"
+                >
                   {(["metric", "imperial"] as const).map((u) => (
                     <button
                       key={u}
@@ -242,17 +265,36 @@ export function BuildClient() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <Label text={`Height (${lengthLabel(units)})`}>
-                  <input className={field} inputMode="decimal" value={form.height} onChange={(e) => set("height", e.target.value)} />
+                  <input
+                    className={field}
+                    inputMode="decimal"
+                    value={form.height}
+                    onChange={(e) => set("height", e.target.value)}
+                  />
                 </Label>
                 <Label text={`Weight (${weightLabel(units)})`}>
-                  <input className={field} inputMode="decimal" value={form.weight} onChange={(e) => set("weight", e.target.value)} />
+                  <input
+                    className={field}
+                    inputMode="decimal"
+                    value={form.weight}
+                    onChange={(e) => set("weight", e.target.value)}
+                  />
                 </Label>
                 <Label text="Age">
-                  <input className={field} inputMode="numeric" value={form.age} onChange={(e) => set("age", e.target.value)} />
+                  <input
+                    className={field}
+                    inputMode="numeric"
+                    value={form.age}
+                    onChange={(e) => set("age", e.target.value)}
+                  />
                 </Label>
               </div>
               <Label text="Training experience">
-                <select className={field} value={form.experience} onChange={(e) => set("experience", e.target.value as Experience)}>
+                <select
+                  className={field}
+                  value={form.experience}
+                  onChange={(e) => set("experience", e.target.value as Experience)}
+                >
                   <option value="beginner">Beginner (under 1 year of consistent training)</option>
                   <option value="intermediate">Intermediate (1 to 3 years)</option>
                   <option value="advanced">Advanced (3+ years)</option>
@@ -271,11 +313,18 @@ export function BuildClient() {
                     ] as const
                   ).map(([k, label]) => (
                     <Label key={k} text={`${label} (${lengthLabel(units)})`}>
-                      <input className={field} inputMode="decimal" value={form[k]} onChange={(e) => set(k, e.target.value)} />
+                      <input
+                        className={field}
+                        inputMode="decimal"
+                        value={form[k]}
+                        onChange={(e) => set(k, e.target.value)}
+                      />
                     </Label>
                   ))}
                 </div>
-                <p className="mt-3 text-xs text-mute">Stored only in this browser. Used for context and to track change over time.</p>
+                <p className="mt-3 text-xs text-mute">
+                  Stored only in this browser. Used for context and to track change over time.
+                </p>
               </details>
             </div>
           )}
@@ -305,7 +354,9 @@ export function BuildClient() {
           {step === 2 && (
             <div className="space-y-4">
               <h1 className="font-display text-3xl">Your equipment</h1>
-              <p className="text-sm text-mute">Bodyweight exercises are always included. Tap everything you can use.</p>
+              <p className="text-sm text-mute">
+                Bodyweight exercises are always included. Tap everything you can use.
+              </p>
               <div className="flex flex-wrap gap-2">
                 {EQUIPMENT.map((eq) => {
                   const on = form.equipment.includes(eq);
@@ -313,7 +364,12 @@ export function BuildClient() {
                     <button
                       key={eq}
                       aria-pressed={on}
-                      onClick={() => set("equipment", on ? form.equipment.filter((x) => x !== eq) : [...form.equipment, eq])}
+                      onClick={() =>
+                        set(
+                          "equipment",
+                          on ? form.equipment.filter((x) => x !== eq) : [...form.equipment, eq],
+                        )
+                      }
                       className={`rounded-full border px-4 py-2 text-sm transition ${on ? "border-ember bg-ember/15 text-ember" : "border-line text-mute hover:text-white"}`}
                     >
                       {EQUIPMENT_LABEL[eq]}
@@ -321,7 +377,10 @@ export function BuildClient() {
                   );
                 })}
               </div>
-              <p className="text-xs text-mute">A bench is only needed for exercises that use it, and a barbell assumes a rack with safety bars.</p>
+              <p className="text-xs text-mute">
+                A bench is only needed for exercises that use it, and a barbell assumes a rack with
+                safety bars.
+              </p>
             </div>
           )}
 
@@ -329,26 +388,52 @@ export function BuildClient() {
             <div className="space-y-5">
               <h1 className="font-display text-3xl">Your schedule</h1>
               <Label text={`Days per week: ${form.days}`}>
-                <input type="range" min={2} max={6} value={form.days} onChange={(e) => set("days", Number(e.target.value))} className="w-full accent-[#ff7a45]" />
+                <input
+                  type="range"
+                  min={2}
+                  max={6}
+                  value={form.days}
+                  onChange={(e) => set("days", Number(e.target.value))}
+                  className="w-full accent-[#ff7a45]"
+                />
               </Label>
               <Label text={`Minutes per session: ${form.minutes}`}>
-                <input type="range" min={20} max={90} step={5} value={form.minutes} onChange={(e) => set("minutes", Number(e.target.value))} className="w-full accent-[#ff7a45]" />
+                <input
+                  type="range"
+                  min={20}
+                  max={90}
+                  step={5}
+                  value={form.minutes}
+                  onChange={(e) => set("minutes", Number(e.target.value))}
+                  className="w-full accent-[#ff7a45]"
+                />
               </Label>
-              <p className="text-xs text-mute">If your goal text names a number of days, that takes priority.</p>
+              <p className="text-xs text-mute">
+                If your goal text names a number of days, that takes priority.
+              </p>
             </div>
           )}
 
-          {error && <p className="mt-4 text-sm text-red-300" role="alert">{error}</p>}
+          {error && (
+            <p className="mt-4 text-sm text-red-300" role="alert">
+              {error}
+            </p>
+          )}
 
           <div className="mt-8 flex items-center justify-between">
             <button
-              onClick={() => (step === 0 ? (saved ? setEditing(false) : undefined) : setStep(step - 1))}
+              onClick={() =>
+                step === 0 ? (saved ? setEditing(false) : undefined) : setStep(step - 1)
+              }
               className={`rounded-lg px-4 py-2 text-sm text-mute hover:text-white ${step === 0 && !saved ? "invisible" : ""}`}
             >
               {step === 0 ? "Cancel" : "Back"}
             </button>
             {step < STEPS.length - 1 ? (
-              <button onClick={next} className="rounded-full bg-white px-6 py-2.5 text-sm font-medium text-black hover:bg-stone-200">
+              <button
+                onClick={next}
+                className="rounded-full bg-white px-6 py-2.5 text-sm font-medium text-black hover:bg-stone-200"
+              >
                 Continue
               </button>
             ) : (
@@ -366,7 +451,9 @@ export function BuildClient() {
     );
   }
 
-  return plan && saved ? <PlanView plan={plan} interpretation={saved.interpretation} onEdit={startEdit} /> : null;
+  return plan && saved ? (
+    <PlanView plan={plan} interpretation={saved.interpretation} onEdit={startEdit} />
+  ) : null;
 }
 
 const GOAL_LABEL: Record<Plan["goal"], string> = {
@@ -377,17 +464,33 @@ const GOAL_LABEL: Record<Plan["goal"], string> = {
   general: "General fitness",
 };
 
-function PlanView({ plan, interpretation, onEdit }: { plan: Plan; interpretation: Interpretation; onEdit: () => void }) {
+function PlanView({
+  plan,
+  interpretation,
+  onEdit,
+}: {
+  plan: Plan;
+  interpretation: Interpretation;
+  onEdit: () => void;
+}) {
   return (
     <main className="mx-auto max-w-3xl px-5 pb-20">
       <header className="rise mb-8">
         <div className="no-print mb-3 flex items-center justify-between">
-          <span className="rounded-full border border-ember/40 bg-ember/10 px-3 py-1 text-xs text-ember">{GOAL_LABEL[plan.goal]}</span>
+          <span className="rounded-full border border-ember/40 bg-ember/10 px-3 py-1 text-xs text-ember">
+            {GOAL_LABEL[plan.goal]}
+          </span>
           <div className="flex gap-2">
-            <button onClick={() => window.print()} className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-white/5">
+            <button
+              onClick={() => window.print()}
+              className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-white/5"
+            >
               Print
             </button>
-            <button onClick={onEdit} className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-white/5">
+            <button
+              onClick={onEdit}
+              className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-white/5"
+            >
               Edit inputs
             </button>
           </div>
@@ -416,15 +519,24 @@ function PlanView({ plan, interpretation, onEdit }: { plan: Plan; interpretation
             </div>
           )}
         </dl>
-        <p className="mt-2 text-xs text-mute">These ratios are rough context only. They don't measure fitness or health on their own.</p>
+        <p className="mt-2 text-xs text-mute">
+          These ratios are rough context only. They don&apos;t measure fitness or health on their
+          own.
+        </p>
       </header>
 
       <div className="space-y-3">
         {plan.days.map((day, i) => (
-          <details key={`${day.name}-${i}`} open={i === 0} className="rise card-sheen rounded-2xl border border-line p-5">
+          <details
+            key={`${day.name}-${i}`}
+            open={i === 0}
+            className="rise card-sheen rounded-2xl border border-line p-5"
+          >
             <summary className="flex cursor-pointer items-center justify-between gap-4">
               <span className="flex items-center gap-4">
-                <span className="grid h-11 w-11 place-items-center rounded-lg bg-ember/15 text-sm font-medium text-ember">{day.weekday}</span>
+                <span className="grid h-11 w-11 place-items-center rounded-lg bg-ember/15 text-sm font-medium text-ember">
+                  {day.weekday}
+                </span>
                 <span>
                   <span className="block font-medium">{day.name}</span>
                   <span className="block text-xs text-mute">{day.focus}</span>
@@ -449,7 +561,11 @@ function PlanView({ plan, interpretation, onEdit }: { plan: Plan; interpretation
                 </li>
               ))}
             </ol>
-            {day.finisher && <p className="mt-4 rounded-lg border border-line p-3 text-sm text-mute">Finisher: {day.finisher}</p>}
+            {day.finisher && (
+              <p className="mt-4 rounded-lg border border-line p-3 text-sm text-mute">
+                Finisher: {day.finisher}
+              </p>
+            )}
           </details>
         ))}
       </div>

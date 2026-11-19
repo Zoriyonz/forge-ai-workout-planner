@@ -15,12 +15,24 @@ export function validateInterpretation(raw: unknown): Interpretation | undefined
   const o = raw as Record<string, unknown>;
   if (typeof o.goal !== "string" || !GOALS.includes(o.goal as Goal)) return undefined;
   const emphasis = Array.isArray(o.emphasis)
-    ? (o.emphasis.filter((m): m is Muscle => typeof m === "string" && (MUSCLES as readonly string[]).includes(m)))
+    ? o.emphasis.filter(
+        (m): m is Muscle => typeof m === "string" && (MUSCLES as readonly string[]).includes(m),
+      )
     : [];
-  const days = typeof o.daysPerWeek === "number" && o.daysPerWeek >= 2 && o.daysPerWeek <= 6 ? Math.round(o.daysPerWeek) : undefined;
-  const summary = typeof o.summary === "string" && o.summary.trim() ? o.summary.trim().slice(0, 240) : undefined;
+  const days =
+    typeof o.daysPerWeek === "number" && o.daysPerWeek >= 2 && o.daysPerWeek <= 6
+      ? Math.round(o.daysPerWeek)
+      : undefined;
+  const summary =
+    typeof o.summary === "string" && o.summary.trim() ? o.summary.trim().slice(0, 240) : undefined;
   if (!summary) return undefined;
-  return { goal: o.goal as Goal, emphasis: [...new Set(emphasis)], daysPerWeek: days, summary, source: "claude" };
+  return {
+    goal: o.goal as Goal,
+    emphasis: [...new Set(emphasis)],
+    daysPerWeek: days,
+    summary,
+    source: "claude",
+  };
 }
 
 /**
@@ -40,7 +52,11 @@ export async function interpretGoal(
   try {
     const res = await fetchImpl("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+      },
       body: JSON.stringify({
         model: env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
         max_tokens: 300,

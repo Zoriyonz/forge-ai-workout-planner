@@ -3,7 +3,10 @@ import type { Goal, Interpretation, Limitation, Muscle } from "./types";
 const GOAL_KEYWORDS: [Goal, RegExp][] = [
   ["fat_loss", /\b(lose|losing|fat|cut|cutting|lean|leaner|slim|tone|toned|weight loss|shred)\b/],
   ["strength", /\b(strong|stronger|strength|powerlift\w*|power|heavy|1rm|deadlift|squat|bench)\b/],
-  ["muscle_gain", /\b(muscle|muscles|bulk|bulking|size|hypertrophy|bigger|build|gain|mass|physique)\b/],
+  [
+    "muscle_gain",
+    /\b(muscle|muscles|bulk|bulking|size|hypertrophy|bigger|build|gain|mass|physique)\b/,
+  ],
   ["endurance", /\b(run|running|endurance|cardio|stamina|marathon|5k|10k|conditioning|fitness)\b/],
 ];
 

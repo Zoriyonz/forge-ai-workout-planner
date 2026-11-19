@@ -8,6 +8,8 @@ export function usePersisted<T>(key: string, initial: T) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Deliberate: hydrate from localStorage after mount so server and client markup match.
+    /* eslint-disable react-hooks/set-state-in-effect */
     try {
       const raw = window.localStorage.getItem(key);
       if (raw) setValue(JSON.parse(raw) as T);
@@ -15,6 +17,7 @@ export function usePersisted<T>(key: string, initial: T) {
       /* ignore corrupt or unavailable storage */
     }
     setReady(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [key]);
 
   const set = useCallback(

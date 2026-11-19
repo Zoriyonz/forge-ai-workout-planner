@@ -74,7 +74,18 @@ const TEMPLATES: Record<DayType, Slot[]> = {
 };
 
 const DOMAIN: Record<DayType, Muscle[]> = {
-  full: ["chest", "back", "shoulders", "biceps", "triceps", "quads", "hamstrings", "glutes", "calves", "core"],
+  full: [
+    "chest",
+    "back",
+    "shoulders",
+    "biceps",
+    "triceps",
+    "quads",
+    "hamstrings",
+    "glutes",
+    "calves",
+    "core",
+  ],
   upper: ["chest", "back", "shoulders", "biceps", "triceps"],
   lower: ["quads", "hamstrings", "glutes", "calves"],
   push: ["chest", "shoulders", "triceps"],
@@ -110,7 +121,12 @@ const WEEKDAYS: Record<number, string[]> = {
 const LEVEL: Record<Experience, number> = { beginner: 1, intermediate: 2, advanced: 3 };
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, Math.round(n)));
 
-function available(ex: Exercise, owned: Set<string>, avoid: Set<Limitation>, exp: Experience): boolean {
+function available(
+  ex: Exercise,
+  owned: Set<string>,
+  avoid: Set<Limitation>,
+  exp: Experience,
+): boolean {
   if (!ex.requires.every((r) => owned.has(r))) return false;
   if (ex.avoid?.some((l) => avoid.has(l))) return false;
   if (exp === "beginner" && ex.level === 3) return false;
@@ -144,7 +160,9 @@ function pick(
     );
   let list = candidates(true);
   if (list.length === 0 && slot.muscle) list = candidates(false);
-  return list.sort((a, b) => score(b, goal, exp, used) - score(a, goal, exp, used) || a.id.localeCompare(b.id))[0];
+  return list.sort(
+    (a, b) => score(b, goal, exp, used) - score(a, goal, exp, used) || a.id.localeCompare(b.id),
+  )[0];
 }
 
 function prescribe(
@@ -164,10 +182,16 @@ function prescribe(
       else ({ sets, reps, rest } = { sets: 3, reps: "8-10", rest: 90 });
       break;
     case "muscle_gain":
-      ({ sets, reps, rest } = isolation ? { sets: 3, reps: "10-15", rest: 60 } : { sets: index < 2 && exp === "advanced" ? 4 : 3, reps: "8-12", rest: 90 });
+      ({ sets, reps, rest } = isolation
+        ? { sets: 3, reps: "10-15", rest: 60 }
+        : { sets: index < 2 && exp === "advanced" ? 4 : 3, reps: "8-12", rest: 90 });
       break;
     case "fat_loss":
-      ({ sets, reps, rest } = { sets: 3, reps: isolation ? "12-15" : "10-15", rest: isolation ? 45 : 60 });
+      ({ sets, reps, rest } = {
+        sets: 3,
+        reps: isolation ? "12-15" : "10-15",
+        rest: isolation ? 45 : 60,
+      });
       break;
     case "endurance":
       ({ sets, reps, rest } = { sets: 3, reps: "15-20", rest: 45 });
@@ -213,11 +237,18 @@ export function generatePlan(profile: Profile, interpretation?: Interpretation):
   const weekdays = WEEKDAYS[days] ?? WEEKDAYS[3]!;
 
   const finisherMinutes =
-    interp.goal === "fat_loss" && minutes >= 40 ? 8 : interp.goal === "endurance" && minutes >= 45 ? 12 : 0;
+    interp.goal === "fat_loss" && minutes >= 40
+      ? 8
+      : interp.goal === "endurance" && minutes >= 45
+        ? 12
+        : 0;
   const budget = minutes - 8 - finisherMinutes;
 
   const used = new Map<string, number>();
-  const typeTotals = layout.reduce<Record<string, number>>((acc, t) => ({ ...acc, [t]: (acc[t] ?? 0) + 1 }), {});
+  const typeTotals = layout.reduce<Record<string, number>>(
+    (acc, t) => ({ ...acc, [t]: (acc[t] ?? 0) + 1 }),
+    {},
+  );
   const typeSeen: Record<string, number> = {};
 
   const planDays: PlanDay[] = layout.map((type, i) => {
@@ -271,7 +302,9 @@ export function generatePlan(profile: Profile, interpretation?: Interpretation):
     );
   }
   if (profile.equipment.length === 0) {
-    notes.push("Planned with bodyweight only. Resistance bands or dumbbells would unlock many more options.");
+    notes.push(
+      "Planned with bodyweight only. Resistance bands or dumbbells would unlock many more options.",
+    );
   }
   if (interp.daysPerWeek && interp.daysPerWeek !== profile.daysPerWeek) {
     notes.push(`Your goal mentioned ${interp.daysPerWeek} days a week, so the plan uses that.`);

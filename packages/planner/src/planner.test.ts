@@ -23,7 +23,8 @@ const base: Profile = {
   limitationsText: "",
 };
 
-const allExercises = (p: ReturnType<typeof generatePlan>) => p.days.flatMap((d) => d.exercises.map((x) => x.exercise));
+const allExercises = (p: ReturnType<typeof generatePlan>) =>
+  p.days.flatMap((d) => d.exercises.map((x) => x.exercise));
 
 describe("parseGoal", () => {
   it("detects muscle gain, emphasis and days per week", () => {
@@ -45,7 +46,9 @@ describe("parseGoal", () => {
 
 describe("parseLimitations", () => {
   it("maps phrases to body areas", () => {
-    expect(parseLimitations("bad knees and some lower back pain")).toEqual(expect.arrayContaining(["knee", "back"]));
+    expect(parseLimitations("bad knees and some lower back pain")).toEqual(
+      expect.arrayContaining(["knee", "back"]),
+    );
     expect(parseLimitations("none")).toEqual([]);
   });
 });
@@ -67,7 +70,12 @@ describe("generatePlan", () => {
   });
 
   it("skips exercises that conflict with a mentioned limitation", () => {
-    const plan = generatePlan({ ...base, equipment: ["dumbbells"], limitationsText: "bad knees", goalText: "lose fat" });
+    const plan = generatePlan({
+      ...base,
+      equipment: ["dumbbells"],
+      limitationsText: "bad knees",
+      goalText: "lose fat",
+    });
     expect(allExercises(plan).some((x) => x.avoid?.includes("knee"))).toBe(false);
     expect(plan.avoided).toContain("knee");
     expect(plan.notes.join(" ")).toMatch(/clinician/i);
@@ -105,7 +113,11 @@ describe("generatePlan", () => {
   });
 
   it("excludes the hardest exercises for beginners", () => {
-    const plan = generatePlan({ ...base, experience: "beginner", equipment: ["barbell", "bench", "pullup_bar"] });
+    const plan = generatePlan({
+      ...base,
+      experience: "beginner",
+      equipment: ["barbell", "bench", "pullup_bar"],
+    });
     expect(allExercises(plan).every((x) => x.level < 3)).toBe(true);
   });
 });
@@ -133,15 +145,31 @@ describe("interpretGoal", () => {
   });
 
   it("accepts valid model output", async () => {
-    const body = { content: [{ type: "text", text: '{"goal":"strength","emphasis":["back","bogus"],"daysPerWeek":4,"summary":"Get stronger."}' }] };
-    const f = vi.fn().mockResolvedValue({ ok: true, json: async () => body }) as unknown as typeof fetch;
+    const body = {
+      content: [
+        {
+          type: "text",
+          text: '{"goal":"strength","emphasis":["back","bogus"],"daysPerWeek":4,"summary":"Get stronger."}',
+        },
+      ],
+    };
+    const f = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => body }) as unknown as typeof fetch;
     const r = await interpretGoal("stronger back", { ANTHROPIC_API_KEY: "k" }, f);
-    expect(r).toMatchObject({ goal: "strength", emphasis: ["back"], daysPerWeek: 4, source: "claude" });
+    expect(r).toMatchObject({
+      goal: "strength",
+      emphasis: ["back"],
+      daysPerWeek: 4,
+      source: "claude",
+    });
   });
 
   it("rejects invalid model output and falls back", async () => {
     const body = { content: [{ type: "text", text: '{"goal":"become a wizard","summary":"x"}' }] };
-    const f = vi.fn().mockResolvedValue({ ok: true, json: async () => body }) as unknown as typeof fetch;
+    const f = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => body }) as unknown as typeof fetch;
     const r = await interpretGoal("lose fat", { ANTHROPIC_API_KEY: "k" }, f);
     expect(r.source).toBe("local");
     expect(r.goal).toBe("fat_loss");

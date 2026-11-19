@@ -36,13 +36,20 @@ export default function Home() {
               around you.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-mute">
-              Share your measurements, your goal and the equipment you actually have. Forge builds a week of training that fits your schedule, and tracks your progress privately.
+              Share your measurements, your goal and the equipment you actually have. Forge builds a
+              week of training that fits your schedule, and tracks your progress privately.
             </p>
             <div className="mt-8 flex gap-3">
-              <Link href="/build" className="rounded-full bg-ember px-6 py-3 text-sm font-medium text-black hover:brightness-110">
+              <Link
+                href="/build"
+                className="rounded-full bg-ember px-6 py-3 text-sm font-medium text-black hover:brightness-110"
+              >
                 Build my plan
               </Link>
-              <Link href="/progress" className="rounded-full border border-line px-6 py-3 text-sm hover:bg-white/5">
+              <Link
+                href="/progress"
+                className="rounded-full border border-line px-6 py-3 text-sm hover:bg-white/5"
+              >
                 Track progress
               </Link>
             </div>
@@ -52,8 +59,13 @@ export default function Home() {
             <p className="mb-4 text-xs uppercase tracking-widest text-mute">This week</p>
             <div className="space-y-3">
               {sample.map((s) => (
-                <div key={s.day} className="flex items-center gap-4 rounded-xl border border-line bg-black/20 p-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-lg bg-ember/15 text-sm font-medium text-ember">{s.day}</span>
+                <div
+                  key={s.day}
+                  className="flex items-center gap-4 rounded-xl border border-line bg-black/20 p-3"
+                >
+                  <span className="grid h-11 w-11 place-items-center rounded-lg bg-ember/15 text-sm font-medium text-ember">
+                    {s.day}
+                  </span>
                   <div>
                     <p className="text-sm font-medium">{s.name}</p>
                     <p className="text-xs text-mute">{s.detail}</p>
@@ -74,7 +86,8 @@ export default function Home() {
         </section>
 
         <footer className="border-t border-line py-8 text-sm text-mute">
-          Forge gives general fitness guidance, not medical advice. If you have an injury or health condition, check with a clinician before starting a new program.
+          Forge gives general fitness guidance, not medical advice. If you have an injury or health
+          condition, check with a clinician before starting a new program.
         </footer>
       </main>
     </>
