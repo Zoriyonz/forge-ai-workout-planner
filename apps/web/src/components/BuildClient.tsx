@@ -12,6 +12,7 @@ import {
   type Profile,
 } from "@forge/planner";
 import { useMemo, useState } from "react";
+import { downloads } from "@/lib/download";
 import { usePersisted } from "@/lib/storage";
 import {
   fromCm,
@@ -480,7 +481,20 @@ function PlanView({
           <span className="rounded-full border border-ember/40 bg-ember/10 px-3 py-1 text-xs text-ember">
             {GOAL_LABEL[plan.goal]}
           </span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              onClick={() => downloads.calendar(plan)}
+              className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-white/5"
+              title="Weekly recurring events for Google, Apple or Outlook calendar"
+            >
+              Calendar
+            </button>
+            <button
+              onClick={() => downloads.markdown(plan)}
+              className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-white/5"
+            >
+              Markdown
+            </button>
             <button
               onClick={() => window.print()}
               className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-white/5"
